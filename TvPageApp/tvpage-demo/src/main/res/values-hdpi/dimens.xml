@@ -1,0 +1,9 @@
+<resources>
+    <dimen name="videoview_height">240dp</dimen>
+    <dimen name="videoview_home_row_height">160dp</dimen>
+    <dimen name="img_gallery_channel_top_height">150dp</dimen>
+
+    <dimen name="home_latest_video_item_width">260dp</dimen>
+
+    <dimen name="product_detail_image_height">300dp</dimen>
+</resources>

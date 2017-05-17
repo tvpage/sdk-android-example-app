@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">TVPage Player</string>
+    <string name="description">Media Controls</string>
+    <string name="home">HOME</string>
+    <string name="coffee">COFFEE</string>
+    <string name="equipment">EQUIPMENT</string>
+    <string name="drinkware">DRINKWARE</string>
+    <string name="our_blog">OUR BLOG</string>
+    <string name="video_gallery">VIDEO GALLERY</string>
+    <string name="dummy_txt">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard
+        dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.
+        It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.
+        </string>
+    <string name="subscribe_to">SUBSCRIBE TO CHANNEL</string>
+    <string name="product_info">Product Info</string>
+    <string name="reviews">Reviews</string>
+    <string name="shipping">Shipping</string>
+    <string name="product_q_amp_a">Product Q &amp; A</string>
+    <string name="add_to_bag">ADD TO BAG</string>
+    <string name="view_details">VIEW DETAILS</string>
+    <string name="load_more">Load More</string>
+
+</resources>

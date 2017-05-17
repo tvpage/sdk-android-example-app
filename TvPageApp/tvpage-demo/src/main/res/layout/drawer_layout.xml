@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?><!--<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/scrollDrawer"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/header_color"
+    android:fillViewport="true"
+    android:scrollbars="none">-->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:fancy="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/linear_drawer_parent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/app_background"
+    android:orientation="vertical"
+    android:paddingLeft="10dp"
+    android:paddingRight="10dp"
+    tools:ignore="MissingPrefix">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/imgCloseDrawer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:padding="10dp"
+            android:src="@drawable/close_white_n" />
+
+        <ImageView
+            android:id="@+id/imgLogoDrawer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_centerVertical="true"
+            android:paddingBottom="10dp"
+            android:paddingTop="10dp"
+            android:src="@drawable/logo_header_n" />
+
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/tvHome"
+        style="@style/DrawerTextViewStyle"
+        fontPath="fonts/Dosis-Bold.ttf"
+        android:layout_marginTop="15dp"
+        android:text="@string/home" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="10dp"
+        android:background="@color/white" />
+
+    <TextView
+        android:id="@+id/tvCoffee"
+        style="@style/DrawerTextViewStyle"
+        fontPath="fonts/Dosis-Bold.ttf"
+        android:layout_marginTop="15dp"
+        android:text="@string/coffee" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="10dp"
+        android:background="@color/white" />
+
+    <TextView
+        android:id="@+id/tvEquipment"
+        style="@style/DrawerTextViewStyle"
+        fontPath="fonts/Dosis-Bold.ttf"
+        android:layout_marginTop="15dp"
+        android:text="@string/equipment" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="10dp"
+        android:background="@color/white" />
+
+    <TextView
+        android:id="@+id/tvDrinkWare"
+        style="@style/DrawerTextViewStyle"
+        fontPath="fonts/Dosis-Bold.ttf"
+        android:layout_marginTop="15dp"
+        android:text="@string/drinkware" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="10dp"
+        android:background="@color/white" />
+
+    <TextView
+        android:id="@+id/tvOurBlog"
+        style="@style/DrawerTextViewStyle"
+        fontPath="fonts/Dosis-Bold.ttf"
+        android:layout_marginTop="15dp"
+        android:text="@string/our_blog" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="10dp"
+        android:background="@color/white" />
+
+    <TextView
+        android:id="@+id/tvVideoGallery"
+        style="@style/DrawerTextViewStyle"
+        fontPath="fonts/Dosis-Bold.ttf"
+        android:layout_marginTop="15dp"
+        android:drawableLeft="@drawable/video_gallery"
+        android:drawablePadding="5dp"
+        android:gravity="center_vertical"
+        android:text="@string/video_gallery" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="10dp"
+        android:background="@color/white" />
+
+</LinearLayout>
+
+
+    <!--</ScrollView>-->
