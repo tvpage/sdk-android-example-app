@@ -1,5 +1,7 @@
 package com.tvpage.demo.fragments;
 
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -11,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -19,6 +22,8 @@ import com.tvpage.demo.model.ProductModel;
 import com.tvpage.demo.model.TvPageVideoModel;
 import com.tvpage.demo.utils.CommonUtils;
 import com.tvpage.demo.R;
+import com.tvpage.demo.utils.ItemClickListener;
+import com.tvpage.demo.utils.MyPreferencesForTvPageApp;
 import com.tvpage.lib.utils.TvPageInterfaces;
 
 import com.tvpage.lib.api_listeners.OnTvPageResponseApiListener;
@@ -32,7 +37,12 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
+import static com.tvpage.demo.utils.CommonUtils.NUMBER_OF_RESULT_TO_RETURN;
+import static com.tvpage.demo.utils.CommonUtils.PARCABLE_VIDEO_MODEL_KEY;
+import static com.tvpage.demo.utils.CommonUtils.VIDEO_DETAIL_FROM_CHANNEL_DETAIL_KEY;
+import static com.tvpage.demo.utils.CommonUtils.VIDEO_DETAIL_FROM_CHANNEL_LIST_KEY;
 import static com.tvpage.lib.utils.TvPageUtils.NORMAL_TVPAGE_VIDEO_TYPE;
 import static com.tvpage.lib.utils.TvPageUtils.VIMEO_PRE_URLS;
 import static com.tvpage.lib.utils.TvPageUtils.VIMEO_VIDEO_TYPE;
@@ -43,7 +53,7 @@ import static com.tvpage.lib.utils.TvPageUtils.YOUTUBE_VIDEO_TYPE;
  * Created by MTPC-110 on 4/6/2017.
  */
 
-public class VideoDetailFragment extends BaseFragment implements View.OnClickListener {
+public class VideoDetailFragment extends BaseFragment implements View.OnClickListener, ItemClickListener {
     private RecyclerView horizontalRecyclerView;
     private HorizontalAdapter adapter;
     private ArrayList<ProductModel> productList = new ArrayList<ProductModel>();
@@ -54,6 +64,7 @@ public class VideoDetailFragment extends BaseFragment implements View.OnClickLis
     //intent data
     String titleIntent = "";
     String idIntent = "";
+    String idChannelForVideosIntent = "";
     String typeIntent = "";
     String video_idIntent = "";
     String video_descIntent = "";
@@ -82,6 +93,22 @@ public class VideoDetailFragment extends BaseFragment implements View.OnClickLis
 
     JSONObject jsonControlsToPass = null;
 
+    RecyclerView recyclerVideos;
+
+    int pageNumberFroPagination = 0;
+
+    TextView tvLoadmore;
+    RelativeLayout relLoadMore;
+
+    //ProgressDialog progressDialogBottomList;
+    List<TvPageVideoModel> list = new ArrayList<TvPageVideoModel>();
+    VideoAdapter videoAdapter;
+
+    String sourceDeterminationIntent = "";
+
+    RelativeLayout relBottomVideoListNew;
+
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
@@ -107,6 +134,17 @@ public class VideoDetailFragment extends BaseFragment implements View.OnClickLis
                 tvPageVideoModelFromIntent = b.getParcelable(CommonUtils.PARCABLE_VIDEO_MODEL_KEY);
             }
 
+            if (b.containsKey("channel_id")) {
+                idChannelForVideosIntent = b.getString("channel_id");
+            }
+
+            if (b.containsKey(VIDEO_DETAIL_FROM_CHANNEL_LIST_KEY)) {
+                sourceDeterminationIntent = b.getString(VIDEO_DETAIL_FROM_CHANNEL_LIST_KEY);
+            }
+
+            if (b.containsKey(VIDEO_DETAIL_FROM_CHANNEL_DETAIL_KEY)) {
+                sourceDeterminationIntent = b.getString(VIDEO_DETAIL_FROM_CHANNEL_DETAIL_KEY);
+            }
 
 
          /*   if (b.containsKey("title")) {
@@ -150,13 +188,13 @@ public class VideoDetailFragment extends BaseFragment implements View.OnClickLis
                 tvPageVideoModelFromIntent = b.getParcelable("videoModel_paracalable");
             }*/
         }
-        init();
+        init(false);
     }
 
     /**
      * Init.
      */
-    void init(){
+    void init(boolean isFromBottomList) {
 
         //get data from parcable objects
 
@@ -224,6 +262,12 @@ public class VideoDetailFragment extends BaseFragment implements View.OnClickLis
         horizontalRecyclerView = (RecyclerView) rootView.findViewById(R.id.horizontal_recyclerview);
         txtVideoTitle = (TextView) rootView.findViewById(R.id.txtVideoTitle);
 
+        relBottomVideoListNew = (RelativeLayout) rootView.findViewById(R.id.relBottomVideoListNew);
+
+        tvLoadmore = (TextView) rootView.findViewById(R.id.tvLoadmore);
+        relLoadMore = (RelativeLayout) rootView.findViewById(R.id.relLoadMore);
+
+
         tvPagePlayer = (TvPagePlayer) rootView.findViewById(R.id.tvPagePlayer);
         tvNoProduct = (TextView) rootView.findViewById(R.id.tvNoProduct);
         tvDescription = (TextView) rootView.findViewById(R.id.tvDescription);
@@ -235,13 +279,35 @@ public class VideoDetailFragment extends BaseFragment implements View.OnClickLis
         image_pin = (ImageView) rootView.findViewById(R.id.image_pin);
         ib_drawers_temp = (ImageView) rootView.findViewById(R.id.ib_drawers_temp);
         imgHeaderLogo = (ImageView) rootView.findViewById(R.id.imgHeaderLogo);
+        recyclerVideos = (RecyclerView) rootView.findViewById(R.id.recyclerVideos);
 
         ib_drawer.setOnClickListener(this);
         ib_back.setOnClickListener(this);
         image_pin.setOnClickListener(this);
         imgHeaderLogo.setOnClickListener(this);
+        tvLoadmore.setOnClickListener(this);
+
+        LinearLayoutManager vertLinearLayoutManager
+                = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
+        recyclerVideos.setHasFixedSize(true);
+        recyclerVideos.setLayoutManager(vertLinearLayoutManager);
 
         setTitle();
+
+
+        if (sourceDeterminationIntent.equalsIgnoreCase(CommonUtils.VIDEO_DETAIL_FROM_CHANNEL_DETAIL_VALUE)
+                || sourceDeterminationIntent.equalsIgnoreCase(CommonUtils.VIDEO_DETAIL_FROM_CHANNEL_LIST_VALUE)) {
+            //need to show list
+            relBottomVideoListNew.setVisibility(View.VISIBLE);
+
+            if (!isFromBottomList) {
+                callChannelVideoListApi(false);
+            }
+
+        } else {
+            //hide list layout & dont' call api
+            relBottomVideoListNew.setVisibility(View.GONE);
+        }
 
 
         JSONObject jsonObjectTemp = null;
@@ -249,8 +315,6 @@ public class VideoDetailFragment extends BaseFragment implements View.OnClickLis
         if (jsonObjectTemp != null) {
             jsonControlsToPass = jsonObjectTemp;
         }
-
-
 
 
         //builder
@@ -471,19 +535,27 @@ public class VideoDetailFragment extends BaseFragment implements View.OnClickLis
                 tvPagePlayer.loadVideo(YOUTUBE_PRE_URLS + video_idIntent, jsonObjectToPass);
             } else if (typeIntent.equalsIgnoreCase(VIMEO_VIDEO_TYPE)) {
                 //load vimeo urls
-                tvPagePlayer.loadVideo(VIMEO_PRE_URLS + video_idIntent,  jsonObjectToPass);
+                tvPagePlayer.loadVideo(VIMEO_PRE_URLS + video_idIntent, jsonObjectToPass);
             } else if (typeIntent.equalsIgnoreCase(NORMAL_TVPAGE_VIDEO_TYPE)) {
                 //load normal urls
-                tvPagePlayer.loadVideo("",  jsonObjectToPass);
+                tvPagePlayer.loadVideo("", jsonObjectToPass);
             } else {
                 //load normal urls
-                tvPagePlayer.loadVideo("",  jsonObjectToPass);
+                tvPagePlayer.loadVideo("", jsonObjectToPass);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
 
 
+    }
+
+    void showLoadmore(boolean isNedToShowLoadMore) {
+        if (isNedToShowLoadMore) {
+            relLoadMore.setVisibility(View.VISIBLE);
+        } else {
+            relLoadMore.setVisibility(View.INVISIBLE);
+        }
     }
 
     /*
@@ -585,6 +657,10 @@ public class VideoDetailFragment extends BaseFragment implements View.OnClickLis
                 break;
             case R.id.imgHeaderLogo:
                 mainTvPageActivity.clearBackStackExceptHome();
+                break;
+            case R.id.tvLoadmore:
+                pageNumberFroPagination++;
+                callChannelVideoListApi(true);
                 break;
             default:
                 break;
@@ -689,4 +765,318 @@ public class VideoDetailFragment extends BaseFragment implements View.OnClickLis
 
     }
 
+
+    //Video bottom part video list
+    public void callChannelVideoListApi(final boolean isLoadmOre) {
+        try {
+
+
+            if (CommonUtils.isInternetConnected(getActivity())) {
+
+                String channelIdToPass = "";
+
+                if (!isLoadmOre) {
+                  /*  progressDialogBottomList = new ProgressDialog(getActivity());
+                    progressDialogBottomList.setMessage("Please wait...");
+                    progressDialogBottomList.setCancelable(false);
+                    progressDialogBottomList.show();*/
+                }
+
+                if (sourceDeterminationIntent.equalsIgnoreCase(CommonUtils.VIDEO_DETAIL_FROM_CHANNEL_DETAIL_VALUE)) {
+                    //pput idChannelForVuideosIntent
+                    channelIdToPass = idChannelForVideosIntent;
+                } else if (sourceDeterminationIntent.equalsIgnoreCase(CommonUtils.VIDEO_DETAIL_FROM_CHANNEL_LIST_VALUE)) {
+                    //save Channel id from pref..(Main channel id)
+                    channelIdToPass = MyPreferencesForTvPageApp.getPref(getActivity(), MyPreferencesForTvPageApp.CHANNEL_ID_PREF_KEY);
+                } else {
+
+                }
+
+                //call api of list of videos
+                tvPagePlayer.tvPageChannelsVideosExtractor(channelIdToPass, pageNumberFroPagination, NUMBER_OF_RESULT_TO_RETURN,
+                        "", new OnTvPageResponseApiListener() {
+                            @Override
+                            public void onSuccess(TvPageResponseModel tvPageResponseModel) {
+                                dismissProgressDialog();
+
+
+                                if (tvPageResponseModel != null && tvPageResponseModel.getJsonArray() != null) {
+
+                                    try {
+
+                                        if (!isLoadmOre) {
+                                            list.clear();
+                                        }
+
+
+                                        JSONArray jsonArray = tvPageResponseModel.getJsonArray();
+                                        for (int i = 0; i < jsonArray.length(); i++) {
+                                            JSONObject jsonObject = jsonArray.getJSONObject(i);
+                                            TvPageVideoModel tvPageChannelVideoModel = new TvPageVideoModel();
+
+
+                                  /*  if (!jsonObject.isNull("category")) {
+                                        String category = jsonObject.getString("category");
+                                        //add category list
+                                        //System.out.println(i +" Category productsss channel>>  "+category);
+                                        if (category != null &&
+                                                !TextUtils.isEmpty(category) &&
+                                                category.trim().length() > 0) {
+                                            arrayListProductCategory.add(category);
+                                        }
+                                    }*/
+
+                                            if (!jsonObject.isNull("title")) {
+                                                String title = jsonObject.getString("title");
+                                                //add title in tvpage model
+                                                tvPageChannelVideoModel.setTitle(title);
+                                            }
+                                            if (!jsonObject.isNull("id")) {
+                                                String id = jsonObject.getString("id");
+                                                //add id in tvpage model
+                                                tvPageChannelVideoModel.setId(id);
+                                            }
+
+                                            if (!jsonObject.isNull("description")) {
+                                                String description = jsonObject.getString("description");
+                                                //add id in tvpage model
+                                                tvPageChannelVideoModel.setDescription(description);
+                                            }
+
+                                            if (!jsonObject.isNull("date_created")) {
+                                                String date_created = jsonObject.getString("date_created");
+                                                //add date in tvpage model
+                                                tvPageChannelVideoModel.setDate_created(date_created);
+                                            }
+
+                                            if (!jsonObject.isNull("entityIdParent")) {
+                                                String entityIdParent = jsonObject.getString("entityIdParent");
+                                                //add date in tvpage model
+                                                tvPageChannelVideoModel.setEntityIdParent(entityIdParent);
+                                            }
+
+                                            if (!jsonObject.isNull("asset")) {
+                                                JSONObject jsonObjectAsset = jsonObject.getJSONObject("asset");
+
+                                                TvPageVideoModel.Asset assets = new TvPageVideoModel.Asset();
+                                                //get dash url & hls urls
+                                                if (!jsonObjectAsset.isNull("dashUrl")) {
+                                                    String dashUrl = jsonObjectAsset.getString("dashUrl");
+                                                    assets.setDashUrl(dashUrl);
+                                                }
+
+                                                if (!jsonObjectAsset.isNull("hlsUrl")) {
+                                                    String hlsUrl = jsonObjectAsset.getString("hlsUrl");
+                                                    assets.setHlsUrl(hlsUrl);
+                                                }
+
+                                                if (!jsonObjectAsset.isNull("sources")) {
+
+                                                    JSONArray jsonArray1 = jsonObjectAsset.getJSONArray("sources");
+                                                    List<TvPageVideoModel.Sources> sourceList = new ArrayList<TvPageVideoModel.Sources>();
+                                                    for (int j = 0; j < jsonArray1.length(); j++) {
+
+                                                        JSONObject jsonObject1 = jsonArray1.getJSONObject(j);
+                                                        TvPageVideoModel.Sources sourceToInsert = new TvPageVideoModel.Sources();
+                                                        if (!jsonObject1.isNull("file")) {
+                                                            String file = jsonObject1.getString("file");
+                                                            sourceToInsert.setFile(file);
+                                                        }
+                                                        if (!jsonObject1.isNull("quality")) {
+                                                            String quality = jsonObject1.getString("quality");
+                                                            sourceToInsert.setQuality(quality);
+                                                        }
+
+
+                                                        sourceList.add(sourceToInsert);
+
+                                                    }
+                                                    //add source list
+                                                    assets.setSources(sourceList);
+                                                }
+
+
+                                                if (!jsonObjectAsset.isNull("type")) {
+                                                    String type = jsonObjectAsset.getString("type");
+                                                    //add type list
+                                                    assets.setType(type);
+                                                }
+
+                                                if (!jsonObjectAsset.isNull("thumbnailUrl")) {
+                                                    String thumbnailUrl = jsonObjectAsset.getString("thumbnailUrl");
+                                                    //add type list
+                                                    assets.setThumbnailUrl(thumbnailUrl);
+                                                }
+                                                if (!jsonObjectAsset.isNull("videoId")) {
+                                                    String videoId = jsonObjectAsset.getString("videoId");
+                                                    //add type list
+                                                    assets.setVideoId(videoId);
+                                                }
+                                                if (!jsonObjectAsset.isNull("prettyDuration")) {
+                                                    String prettyDuration = jsonObjectAsset.getString("prettyDuration");
+                                                    assets.setPrettyDuration(prettyDuration);
+                                                }
+
+
+                                                //add assets in tvpage model
+                                                tvPageChannelVideoModel.setAsset(assets);
+                                            }
+
+
+                                            list.add(tvPageChannelVideoModel);
+                                        }
+
+
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+
+
+                                }
+
+                                //set data
+                                setDataToList(isLoadmOre);
+
+
+                            }
+
+                            @Override
+                            public void onFailure(Throwable throwable) {
+                                dismissProgressDialog();
+                                throwable.printStackTrace();
+                            }
+                        });
+            } else {
+
+                dismissProgressDialog();
+                CommonUtils.makeToast("No Internet Connection", getActivity());
+            }
+        } catch (Exception e) {
+            dismissProgressDialog();
+            e.printStackTrace();
+        }
+    }
+
+    void dismissProgressDialog() {
+        //setProgressLoadMore(false);
+       /* if (progressDialogBottomList != null && progressDialogBottomList.isShowing()) {
+            progressDialogBottomList.dismiss();
+        }*/
+    }
+
+    void setDataToList(boolean isLoadMore) {
+
+
+        if (list != null && list.size() > 0) {
+            if (!isLoadMore) {
+                videoAdapter = new VideoAdapter(getActivity(), list);
+                videoAdapter.setClickListener(this);
+                recyclerVideos.setAdapter(videoAdapter);
+            } else {
+                videoAdapter.notifyDataSetChanged();
+            }
+        } else {
+            showLoadmore(false);
+        }
+
+    }
+
+    @Override
+    public void onItemClick(View view, int position) {
+        if (list.size() > 0) {
+            try {
+                if (tvPagePlayer != null) {
+                    tvPagePlayer.pause();
+                    tvPagePlayer.seek(1);
+                    tvPagePlayer.stop();
+                    tvPagePlayer = null;
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            tvPageVideoModelFromIntent = list.get(position);
+            init(true);
+
+        }
+
+
+    }
+
+
+    public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> {
+
+        private List<TvPageVideoModel> mData;
+        private LayoutInflater mInflater;
+        private ItemClickListener mClickListener;
+
+        // data is passed into the constructor
+        public VideoAdapter(Context context, List<TvPageVideoModel> data) {
+            this.mInflater = LayoutInflater.from(context);
+            this.mData = data;
+        }
+
+        // inflates the cell layout from xml when needed
+        @Override
+        public VideoAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View view = mInflater.inflate(R.layout.item_videos_gallery_list, parent, false);
+            VideoAdapter.ViewHolder viewHolder = new VideoAdapter.ViewHolder(view);
+            return viewHolder;
+        }
+
+        // binds the data to the textview in each cell
+        @Override
+        public void onBindViewHolder(VideoAdapter.ViewHolder holder, int position) {
+            TvPageVideoModel item = mData.get(position);
+            if (item.getTitle() != null && item.getTitle().trim().length() > 0) {
+                holder.txtVideo.setText(item.getTitle());
+            }
+
+            TvPageVideoModel.Asset asset = item.getAsset();
+            if (asset != null && asset.getThumbnailUrl() != null) {
+                CommonUtils.setImageGlide(getActivity(), asset.getThumbnailUrl(), holder.imageVideo);
+
+            }
+        }
+
+        // total number of cells
+        @Override
+        public int getItemCount() {
+            return mData.size();
+        }
+
+
+        // stores and recycles views as they are scrolled off screen
+        public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+            public TextView txtVideo;
+            public ImageView imageVideo;
+            public LinearLayout linearParents;
+
+            public ViewHolder(View itemView) {
+                super(itemView);
+                txtVideo = (TextView) itemView.findViewById(R.id.txtVideo);
+                imageVideo = (ImageView) itemView.findViewById(R.id.imageVideo);
+                linearParents = (LinearLayout) itemView.findViewById(R.id.linearParents);
+                linearParents.setOnClickListener(this);
+            }
+
+            @Override
+            public void onClick(View view) {
+                if (mClickListener != null) mClickListener.onItemClick(view, getAdapterPosition());
+            }
+        }
+
+        // convenience method for getting data at click position
+        /*public VideoBean getItem(int id) {
+            return mData.get(id);
+        }*/
+
+        // allows clicks events to be caught
+        public void setClickListener(ItemClickListener itemClickListener) {
+            this.mClickListener = itemClickListener;
+        }
+
+
+    }
 }

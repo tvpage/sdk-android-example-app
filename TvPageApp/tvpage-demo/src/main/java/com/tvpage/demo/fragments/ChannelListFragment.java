@@ -340,9 +340,6 @@ public class ChannelListFragment extends BaseFragment implements ItemClickListen
                                         }
 
 
-
-
-
                                     } catch (Exception e) {
                                         e.printStackTrace();
                                     }
@@ -587,10 +584,13 @@ public class ChannelListFragment extends BaseFragment implements ItemClickListen
                     bundle.putSerializable("quality_urls", qualityList);*/
 
                     bundle.putParcelable(PARCABLE_VIDEO_MODEL_KEY, list.get(position));
+                    bundle.putString(CommonUtils.VIDEO_DETAIL_FROM_CHANNEL_LIST_KEY, CommonUtils.VIDEO_DETAIL_FROM_CHANNEL_LIST_VALUE);
 
 
                     //push video Detail acttivity
-                    mainTvPageActivity.pushFragments(new VideoDetailFragment(), true, true, false, true, VideoDetailFragment.class.getSimpleName(), bundle);
+
+                    mainTvPageActivity.pushFragments(new VideoDetailFragment(), true, true, false, true,
+                            VideoDetailFragment.class.getSimpleName(), bundle);
                 }
 
 

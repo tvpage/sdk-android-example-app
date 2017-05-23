@@ -46,6 +46,12 @@ public class CommonUtils {
 
     public static final int NUMBER_OF_RESULT_TO_RETURN = 5;
 
+    public static final String VIDEO_DETAIL_FROM_CHANNEL_LIST_KEY = "VIDEO_DETAIL_FROM_CHANNEL_LIST_KEY";
+    public static final String VIDEO_DETAIL_FROM_CHANNEL_LIST_VALUE = "VIDEO_DETAIL_FROM_CHANNEL_LIST_VALUE";
+
+    public static final String VIDEO_DETAIL_FROM_CHANNEL_DETAIL_KEY = "VIDEO_DETAIL_FROM_CHANNEL_DETAIL_KEY";
+    public static final String VIDEO_DETAIL_FROM_CHANNEL_DETAIL_VALUE = "VIDEO_DETAIL_FROM_CHANNEL_DETAIL_VALUE";
+
     public static String getDateFromTimestamp(long timeStamp, String dateFormat) {
 
         try {

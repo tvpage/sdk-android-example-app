@@ -637,6 +637,8 @@ public class ChannelDetailsFragment extends BaseFragment implements View.OnClick
             bundle.putString("entity_id_parent", entity_id_parent);
             bundle.putSerializable("quality_urls", qualityList);*/
             bundle.putParcelable(PARCABLE_VIDEO_MODEL_KEY, list.get(position));
+            bundle.putString("channel_id", idIntent);
+            bundle.putString(CommonUtils.VIDEO_DETAIL_FROM_CHANNEL_DETAIL_KEY, CommonUtils.VIDEO_DETAIL_FROM_CHANNEL_DETAIL_VALUE);
 
 
             //push video Detail acttivity
