@@ -41,7 +41,7 @@ dependencies {
     //custom font
     compile 'uk.co.chrisjenx:calligraphy:2.2.0'
     //tv page library
-    compile 'com.tvpage.lib:tvpage-library:0.0.2'
+    compile 'com.tvpage.lib:tvpage-library:0.0.3'
     compile 'me.zhanghai.android.materialratingbar:library:1.0.2'
     compile 'com.google.code.gson:gson:2.2.4'
 
