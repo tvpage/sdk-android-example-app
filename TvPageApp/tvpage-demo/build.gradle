@@ -3,6 +3,10 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 25
 
+    def gitCommitCount = "git rev-list HEAD --count".execute().text.trim().toBigInteger()
+    project.ext.set("versionCode", gitCommitCount)
+    project.ext.set("versionNameSuffix", "(${gitCommitCount})")
+
     defaultConfig {
         applicationId "com.tvpage.demo"
         minSdkVersion 17
@@ -40,7 +44,7 @@ dependencies {
     //custom font
     compile 'uk.co.chrisjenx:calligraphy:2.2.0'
     //tv page library
-    compile 'com.tvpage.lib:tvpage-library:0.0.4'
+    compile 'com.tvpage.lib:tvpage-library:+'
     compile 'me.zhanghai.android.materialratingbar:library:1.0.2'
     compile 'com.google.code.gson:gson:2.2.4'
 
