@@ -11,8 +11,8 @@ android {
         applicationId "com.tvpage.demo"
         minSdkVersion 17
         targetSdkVersion 25
-        versionCode 1
-        versionName "1.0"
+        versionCode 3
+        versionName "1.2"
 
 
 
@@ -42,10 +42,11 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:25.3.1'
     compile 'com.android.support:design:25.3.1'
     //custom font
-    compile 'uk.co.chrisjenx:calligraphy:2.2.0'
+    compile 'uk.co.chrisjenx:calligraphy:2.3.0'
     //tv page library
-    compile 'com.tvpage.lib:tvpage-library:+'
+    //compile 'com.tvpage.lib:tvpage-library:1.0.21'
+    api 'com.github.tvpage:sdk-android:1.0.24'
     compile 'me.zhanghai.android.materialratingbar:library:1.0.2'
     compile 'com.google.code.gson:gson:2.2.4'
-
+    testCompile 'junit:junit:4.12'
 }
