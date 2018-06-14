@@ -11,39 +11,33 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.tvpage.demo.R;
 import com.tvpage.demo.model.TvPageChannelModel;
 import com.tvpage.demo.model.TvPageVideoModel;
-import com.tvpage.demo.utils.EndlessRecyclerOnScrollListener;
-import com.tvpage.demo.utils.MyPreferencesForTvPageApp;
-import com.tvpage.lib.api_listeners.OnTvPageResponseApiListener;
-
-import com.tvpage.lib.model.TvPageResponseModel;
-
 import com.tvpage.demo.utils.CommonUtils;
 import com.tvpage.demo.utils.ItemClickListener;
-
+import com.tvpage.demo.utils.MyPreferencesForTvPageApp;
+import com.tvpage.lib.api_listeners.OnTvPageResponseApiListener;
+import com.tvpage.lib.model.TvPageResponseModel;
 import com.tvpage.lib.view.TvPagePlayer;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
-import static com.tvpage.demo.utils.CommonUtils.NUMBER_OF_RESULT_TO_RETURN;
 import static com.tvpage.demo.utils.CommonUtils.PARCABLE_VIDEO_MODEL_KEY;
 
 /**
  * Created by MTPC-110 on 4/6/2017.
  */
 
-public class ChannelListFragment extends BaseFragment implements ItemClickListener, View.OnClickListener {
+public class ChannelListFragment extends BaseFragment implements ItemClickListener,
+        View.OnClickListener {
 
     RecyclerView recyclerViewCahnnels;
     RecyclerView recyclerView;
