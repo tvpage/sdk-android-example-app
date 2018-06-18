@@ -1,5 +1,6 @@
 .gradle
 local.properties
+TvPageApp/local.properties
 **/.DS_Store
 build
 TvPageApp/build
