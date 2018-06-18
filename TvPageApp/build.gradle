@@ -15,11 +15,14 @@ buildscript {
 
 allprojects {
     repositories {
+        maven {
+            url "file://${rootProject.projectDir}/repo"
+        }
         jcenter()
         maven {
             url "https://jitpack.io"
         }
-        maven{
+        maven {
             url "http://dl.bintray.com/ahmedrizwan/maven"
         }
         google()
